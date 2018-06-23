@@ -9,7 +9,7 @@ var app = {
         });
 
         $('#messageSubmit').on('click', function() {
-          let message = $('#newMessage').value;
+          let message = $('#message').value;
           handleSubmit(message);
         });
     },
@@ -67,11 +67,11 @@ var app = {
     handleUsernameClick: function(name) {
         console.log(`You just befriended ${name}`);
     },
-    handleSubmit: function(message) {
+    submit: function(message) {
       renderMessage({
           username: 'Current User',
           message: message
-      })
+      });
     }
 
 
