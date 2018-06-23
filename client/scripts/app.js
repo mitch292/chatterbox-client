@@ -1,14 +1,20 @@
 // YOUR CODE HERE:
-class App {
-    constructor() {
-        this.messages = [];
-        this.server = 'http://parse.nyc.hackreactor.com/chatterbox/classes/messages'
+var app = {
+    messages: [],
+    server: 'http://parse.nyc.hackreactor.com/chatterbox/classes/messages',
+    init: function() {
+        $('.username').on('click', function() {
+            let name = $(this).data("user")
+            app.handleUsernameClick(name)
+        });
 
-    }
-    init() {
-        
-    }
-    send(message) {
+        $('#messageSubmit').on('click', function() {
+          let message = $('#newMessage').value;
+          handleSubmit(message);
+        });
+    },
+
+    send:  function(message) {
         $.ajax({
             // This is the url you should use to communicate with the parse API server.
             url: this.server,
@@ -23,14 +29,15 @@ class App {
               console.error('chatterbox: Failed to send message', data);
             }
           });
-    }
-    fetch() {
+    },
+    fetch: function() {
         $.ajax({
             // This is the url you should use to communicate with the parse API server.
             url: this.server,
             type: 'GET',
             success: function (data) {
             //   this.messages.push(data);
+              renderMessage(data)
               console.log('chatterbox: Messages received');
             },
             error: function (data) {
@@ -38,44 +45,36 @@ class App {
               console.error('chatterbox: Failed to receive messages');
             }
           });
-    }
-    clearMessages() {
+    },
+    clearMessages: function() {
       //create a clear messages button on the html
 
       //click handler funciton that would remove all html elements with id of chats
-      $('#chats').remove();
-    }
-    renderMessage(message) {
-        debugger;
+      $('#chats').empty();
+    },
+    renderMessage: function(message) {
+
+        // if ($('#chats').children().length)
         //our site will have an input field with a submit button
         //upon click of submit, grab the text and post and fetch message 
-        $('#chats').prepend("<p>"+ message.text + "</p>");
+        $('#chats').append(`<div class="username" data-user=${message.username}>
+        ${message.username}:  ${message.text} </div>`);
+    },
+    renderRoom: function(message) {
+        $('#roomSelect').append(`<div id="#roomSelect"> ${message} </div>`);
+
+    },
+    handleUsernameClick: function(name) {
+        console.log(`You just befriended ${name}`);
+    },
+    handleSubmit: function(message) {
+      renderMessage({
+          username: 'Current User',
+          message: message
+      })
     }
 
 
 
 
-}
-
-let app = new App()
-
-// $.ajax({
-//     // This is the url you should use to communicate with the parse API server.
-//     url: 'http://parse.nyc.hackreactor.com/chatterbox/classes/messages',
-//     type: 'POST',
-//     data: JSON.stringify(message),
-//     contentType: 'application/json',
-//     success: function (data) {
-//       console.log('chatterbox: Message sent');
-//     },
-//     error: function (data) {
-//       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-//       console.error('chatterbox: Failed to send message', data);
-//     }
-//   });
-  var message = {
-    username: 'shawndrost',
-    text: 'TEST',
-    roomname: 'TEST'
-  };
-  app.fetch();
+};
