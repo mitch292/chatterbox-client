@@ -8,6 +8,7 @@
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
+    <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
         var newSearch = window.location.search;
@@ -28,11 +29,18 @@
       <!-- Your HTML goes here! -->
     </div>
     <div id="chats"></div>
-    <div id="roomSelect">
+    <div>
+      <form action="#" id="send" method="post">
+        <input id="roomAdd" type="text" name="message" placeholder="Add A Room">
+        <input id="roomButton" type="button" value="Add">
+      </form>
+      <select id="roomSelect">
+      </select>
     </div>
-    <form>
-      <input id="message" type="text" name="message" value="">
-      <input id="send" class="submit" type="submit" value="Submit">
+    <form action="#" id="send" method="post">
+      <input id="message" type="text" name="message" placeholder="New Message">
+      <input id="send" class="submit" type="button" value="Submit">
     </form>
+    <script>$(document).ready(app.init())</script>
   </body>
 </html>

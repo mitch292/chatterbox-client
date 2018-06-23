@@ -1,18 +1,7 @@
 // YOUR CODE HERE:
 var app = {
-    messages: [],
+    messages: null,
     server: 'http://parse.nyc.hackreactor.com/chatterbox/classes/messages',
-    init: function() {
-        $('.username').on('click', function() {
-            let name = $(this).data("user")
-            app.handleUsernameClick(name)
-        });
-
-        $('#messageSubmit').on('click', function() {
-          let message = $('#message').value;
-          handleSubmit(message);
-        });
-    },
 
     send:  function(message) {
         $.ajax({
@@ -35,10 +24,10 @@ var app = {
             // This is the url you should use to communicate with the parse API server.
             url: this.server,
             type: 'GET',
+            data: {"order": "-createdAt"},
             success: function (data) {
-            //   this.messages.push(data);
-              renderMessage(data)
-              console.log('chatterbox: Messages received');
+              app.messages = data;
+              app.cleanData();
             },
             error: function (data) {
               // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -57,22 +46,85 @@ var app = {
         // if ($('#chats').children().length)
         //our site will have an input field with a submit button
         //upon click of submit, grab the text and post and fetch message 
-        $('#chats').append(`<div class="username" data-user=${message.username}>
+        $('#chats').prepend(`<div class="username" data-user=${message.username}>
         ${message.username}:  ${message.text} </div>`);
     },
-    renderRoom: function(message) {
-        $('#roomSelect').append(`<div id="#roomSelect"> ${message} </div>`);
+    renderRoom: function(room) {
+        $('#roomSelect').append(`<option id="#room"> ${room} </option>`);
 
     },
     handleUsernameClick: function(name) {
         console.log(`You just befriended ${name}`);
     },
-    submit: function(message) {
-      renderMessage({
-          username: 'Current User',
-          message: message
-      });
-    }
+    handleSubmit: function(data) {
+      let message = $('#message').val();
+      let ourMessage = {
+        username: 'Current User',
+        text: message
+    };
+      app.renderMessage(ourMessage);
+      app.send(ourMessage);
+
+    },
+    init: function() {
+        $('.username').on('click', function() {
+            let name = $(this).data("user")
+            app.handleUsernameClick(name)
+        });
+        $('#room').on('click', function(){
+            let roomName = $(this).val();
+            app.filterRooms(roomName);
+        })
+
+        $('#roomButton').on('click', function(){
+            let roomName = $("#roomAdd").val();
+            app.renderRoom(roomName);
+            $('#roomAdd').val('');
+        });
+        $('.submit').on('click', function(){
+          app.handleSubmit();
+          $('#message').val('');
+        });
+        app.fetch();
+    },
+    cleanData: function() {
+     //loop through messages 
+       //loop through each object
+       //if object value matches our regexp, skip
+       //else we call renderMessage
+      let rooms = {};
+      let dataToParse = app.messages.results;
+      let ourRegex = /[&<>`,!@$%()=+{}[\]]/g;
+     _.each(dataToParse, function(message, i){
+         let safeMessage = true;
+         _.each(message, function(value, key, object){
+             if (value) {
+                if (value.match(ourRegex)){
+                    console.log(value);
+                    safeMessage = false;
+                    // dataToParse.splice(i, 1);
+                  }
+             }
+         })
+         if (safeMessage){
+           app.renderMessage(message);
+           rooms[message.roomname] = message.roomname;
+         }
+     })
+     _.each(rooms, function(room) {
+         app.renderRoom(room)
+     })  
+      
+    },
+    // filterRooms: function(roomName) {
+    //   let ourData = app.messages.results;
+    //   app.clearMessages();
+    //   _.each(ourData, function(message){
+    //     if (message.roomname === roomName){
+    //         app.renderMessage(our)
+    //     }
+    //   })
+    // }
 
 
 
